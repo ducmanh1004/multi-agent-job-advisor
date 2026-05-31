@@ -46,19 +46,6 @@ docker compose up --build
 3. Open `/match` and run matching.
 4. Review `/skill-gap`, `/roadmap`, `/cv-improve`, `/interview`, and `/agent-trace`.
 
-## OpenRouter LLM
-
-Set these values in `.env` to use OpenRouter for LLM-backed agents:
-
-```bash
-LLM_PROVIDER=openrouter
-OpenRouter_API_KEY=your_openrouter_key
-OpenRouter_model_1=nvidia/nemotron-3-super-120b-a12b:free
-OpenRouter_model_2=poolside/laguna-m.1:free
-```
-
-The backend reads `.env` automatically on startup.
-
 ## Production Notes
 
 Local mode stores data in `backend/data/app_state.json`. For production, apply `supabase/migrations/001_init.sql`, run `supabase/seed.sql`, set Supabase env vars, set `STORAGE_BACKEND=supabase`, and replace the local repository with Supabase repository methods.
