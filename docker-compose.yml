@@ -1,0 +1,59 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - .env
+    environment:
+      LOCAL_STORAGE_PATH: /app/backend/data/app_state.json
+      UPLOAD_DIR: /app/backend/uploads
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend-data:/app/backend/data
+      - backend-uploads:/app/backend/uploads
+    depends_on:
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - .env
+    environment:
+      LOCAL_STORAGE_PATH: /app/backend/data/app_state.json
+      UPLOAD_DIR: /app/backend/uploads
+      REDIS_URL: redis://redis:6379/0
+    command: ["python", "-m", "app.workers.runner"]
+    volumes:
+      - backend-data:/app/backend/data
+      - backend-uploads:/app/backend/uploads
+    depends_on:
+      - redis
+      - backend
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  backend-data:
+  backend-uploads:
+
